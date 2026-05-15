@@ -34,4 +34,11 @@ Thumbs.db
 # IDE
 .idea/
 .vscode/
-# MCP local config (keep .mcp.json since it's project config)
+# Generated VS/Rider solution files
+*.slnx
+*.sln
+*.csproj.lscache
+# Claude Code local session data
+.claude/
+# winget leftover
+winget

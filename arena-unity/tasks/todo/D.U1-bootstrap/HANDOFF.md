@@ -57,35 +57,76 @@ If Unity regenerates it with a different GUID, Bootstrap.unity's `[ArenaBootstra
 
 ## Next session checklist (home)
 
-1. Open Unity Editor at `d:\Projects\ArenaPK\`
-2. Wait for package resolve + compile (may take 2–3 min on first open)
-3. Check console for errors (Colyseus/NativeWebSocket/script compile)
-4. If clean → start MCP server: `Window > MCP for Unity > Start Server` → 🟢 Connected
-5. Open this chat (Sonnet session) — run MCP verify:
-   - `mcp__unityMCP__read_console` → filter Error → expect empty
-   - `mcp__unityMCP__manage_editor` enterPlay → watch for `[Bill] Ready.` log
-6. If smoke passes → commit all subs (see commit messages below)
-7. Run Sub 2 (WebGL switch) from `SONNET_PROMPTS.md`
+1. `git pull` tại `d:\Projects\ArenaPK\`
+2. Mở Unity Editor → đợi package resolve + compile (2–3 min)
+3. Check Unity Console cho errors (Colyseus/NativeWebSocket/ArenaBootstrap)
+4. Start MCP server: `Window > MCP for Unity > Start Server` → 🟢 Connected
+5. Mở Claude Code CLI tại `d:\Projects\ArenaPK\` → switch model Sonnet
+6. Paste **PROMPT A** bên dưới vào Sonnet → verify + commit subs
+7. Sau khi Sonnet báo xong → paste **PROMPT B** (Sub 2 WebGL switch)
 
 ---
 
-## Commit messages to run after verify
+## PROMPT A — Paste vào Sonnet (verify + commit subs 3-8)
 
 ```
-chore(arena-unity/Lát-D.U1): add Colyseus SDK + NativeWebSocket + ParrelSync packages
-feat(arena-unity/Lát-D.U1): add BillBootstrapConfig resource
-feat(arena-unity/Lát-D.U1): scaffold Assets/RadiantArena folder layout
-feat(arena-unity/Lát-D.U1): scaffold ArenaEvents.cs placeholder
-feat(arena-unity/Lát-D.U1): add ArenaBootstrap MonoBehaviour with GameReadyEvent gate
-feat(arena-unity/Lát-D.U1): add Bootstrap.unity scene as build index 0
+Bạn là senior Unity 6 client dev theo persona `arena-unity/SKILL.md`. Đọc SKILL.md trước.
+
+Đang ở Lát D.U1 Stage 2 — Subs 3–8 đã được write lên filesystem trước đó (xem HANDOFF.md tại `arena-unity/tasks/todo/D.U1-bootstrap/HANDOFF.md`). Unity vừa mới import xong. Nhiệm vụ: verify compile clean + smoke test + commit từng sub.
+
+## Read first
+- `arena-unity/tasks/todo/D.U1-bootstrap/HANDOFF.md` (current state)
+- `arena-unity/tasks/todo/D.U1-bootstrap/SUBTASKS.md` Sub 9 (smoke test DoD)
+
+## Nhiệm vụ
+1. MCP `read_console` filter Error → phải empty. Nếu có error → STOP, report cho Bill.
+2. MCP `manage_scene` load `Assets/RadiantArena/Scenes/Bootstrap.unity`
+3. MCP `manage_editor` enterPlay → poll until ready → `read_console` confirm:
+   - `[Bill] Ready. N services in Xms.`
+   - `[Arena] bootstrap ready (Bill.IsReady=True)`
+4. MCP `manage_editor` exitPlay
+5. Nếu smoke pass → commit theo thứ tự:
+   - `chore(arena-unity/Lát-D.U1): add Colyseus SDK + NativeWebSocket + ParrelSync packages`
+   - `feat(arena-unity/Lát-D.U1): add BillBootstrapConfig resource`
+   - `feat(arena-unity/Lát-D.U1): scaffold Assets/RadiantArena folder layout`
+   - `feat(arena-unity/Lát-D.U1): scaffold ArenaEvents.cs placeholder`
+   - `feat(arena-unity/Lát-D.U1): add ArenaBootstrap MonoBehaviour with GameReadyEvent gate`
+   - `feat(arena-unity/Lát-D.U1): add Bootstrap.unity scene as build index 0`
+6. `git push`
+
+## STOP sau khi push. Report kết quả cho Bill. KHÔNG proceed Sub 2.
+MCP unavailable → báo Bill, KHÔNG silent fallback.
 ```
 
 ---
 
-## Sub 2 prompt (WebGL switch) — ready to paste when back
+## PROMPT B — Paste vào Sonnet SAU KHI PROMPT A xong (Sub 2: WebGL switch)
 
-See `SONNET_PROMPTS.md` Sub 2. Requires MCP `manage_editor` switchPlatform → WebGL.
+```
+Persona: `arena-unity/SKILL.md`. Lát D.U1 Stage 2 Sub 2.
+
+## Read first
+- `arena-unity/tasks/todo/D.U1-bootstrap/SUBTASKS.md` Sub 2
+
+## Nhiệm vụ: CHỈ Sub 2
+- MCP `manage_editor` switchPlatform → WebGL
+- Poll `editor_state.isCompiling` → false (đợi domain reload xong)
+- PlayerSettings (qua MCP `manage_editor` setPlayerSettings hoặc edit `ProjectSettings/ProjectSettings.asset`):
+  - Scripting Backend → IL2CPP
+  - Api Compatibility Level → .NET Standard 2.1
+  - Default Screen Width = 1280, Height = 720
+- MCP `read_console` filter Error → MUST be empty
+
+## DoD
+Build target = WebGL, console clean, no compile errors.
+
+## Commit
+`chore(arena-unity/Lát-D.U1): switch build target to WebGL + player settings`
+
+## STOP sau commit. KHÔNG proceed Sub 3. Đợi Bill paste sub tiếp.
+MCP unavailable → báo Bill, KHÔNG silent.
+```
 
 ---
 
-*Handoff written 2026-05-15. Next Sonnet session can pick up at "Next session checklist" above.*
+*Handoff written 2026-05-15. Pull repo → mở Unity → paste PROMPT A.*
