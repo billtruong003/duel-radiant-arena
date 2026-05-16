@@ -85,6 +85,9 @@ namespace RadiantArena.Net
         public bool Connected = true;
         public long SignatureCdUntil;
 
+        public WeaponSnapshot[] AvailableWeapons = System.Array.Empty<WeaponSnapshot>();
+        public WeaponSnapshot? LockedWeapon;
+
         public PlayerSnapshot() { }
 
         public PlayerSnapshot(PlayerSchema p)
@@ -99,6 +102,50 @@ namespace RadiantArena.Net
             Ready = p.ready;
             Connected = p.connected;
             SignatureCdUntil = p.signature_cd_until;
+
+            if (p.available_weapons != null && p.available_weapons.Count > 0)
+            {
+                // ArraySchema<T> doesn't implement IEnumerable<T>; iterate via int indexer.
+                var list = new System.Collections.Generic.List<WeaponSnapshot>(p.available_weapons.Count);
+                for (int i = 0; i < p.available_weapons.Count; i++)
+                {
+                    var w = p.available_weapons[i];
+                    if (w != null) list.Add(new WeaponSnapshot(w));
+                }
+                AvailableWeapons = list.ToArray();
+            }
+
+            LockedWeapon = (p.weapon != null && !string.IsNullOrEmpty(p.weapon.slug))
+                ? new WeaponSnapshot(p.weapon)
+                : null;
+        }
+    }
+
+    /// <summary>
+    /// Plain-C# copy of WeaponSchema's display-relevant fields. Lobby + HUD read
+    /// from this; never from the live schema. Skills + full stats deferred to
+    /// D.U4 (TurnInput) and D.U7 (signature skills).
+    /// </summary>
+    public class WeaponSnapshot
+    {
+        public string Slug = "";
+        public string DisplayName = "";
+        /// <summary>'blunt' | 'pierce' | 'spirit'</summary>
+        public string Category = "blunt";
+        /// <summary>'ban_menh' | 'pham' | 'dia' | 'thien' | 'tien'</summary>
+        public string Tier = "pham";
+        /// <summary>Hex color like "#ffaa00", applied as MaterialPropertyBlock tint in D.U8.</summary>
+        public string Hue = "#ffffff";
+
+        public WeaponSnapshot() { }
+
+        public WeaponSnapshot(WeaponSchema w)
+        {
+            Slug = w.slug;
+            DisplayName = w.display_name;
+            Category = w.category;
+            Tier = w.tier;
+            Hue = w.visual != null ? w.visual.hue : "#ffffff";
         }
     }
 }
