@@ -47,3 +47,6 @@ winget
 # MCP for Unity runtime logs (regenerated per session)
 /Assets/UnityMCP/
 /Assets/UnityMCP.meta
+# Screenshots from visual checks — local dev artifacts
+/Assets/Screenshots/
+/Assets/Screenshots.meta

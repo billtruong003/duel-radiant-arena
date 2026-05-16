@@ -58,6 +58,13 @@ Errors at end of Play: 3× PanelSettings + 1× URP missing-types — D.U1 baseli
 
 5. **`ConnectingState.cs` inline-comment for `ManualRoomConnect` updated to `ArenaConnectWindow`.** Carryover hygiene from D.U2's commit `5cf5834` rename.
 
+6. **PanelSettings ThemeStyleSheet + pickingMode shim (post-visual-check).** Visual check (post-Sub-8) caught that BillGameCore's `UIService.Initialize` creates a `PanelSettings` with no `ThemeStyleSheet` — Unity 6 then skips Label text rendering and eats Button click events. Bill reported `"tương tác k đc và chữ thì ko hiện chỉ có section thôi"`. Fixed by:
+   - Adding `Assets/RadiantArena/UI/Resources/ArenaRuntimeTheme.tss` (imports `unity-theme://default` + minor Label/Button/ListView rules).
+   - Extending `ArenaBootstrap.InitArena()` with `ApplyArenaRuntimeTheme()`: loads the TSS via `Resources.Load`, reflects into `Bill.UI._doc.panelSettings.themeStyleSheet`, and flips `_uiRoot.pickingMode = PickingMode.Position` so child Buttons receive clicks. Logs `[Arena] Applied ArenaRuntimeTheme.tss + pickingMode to Bill.UI`.
+   - Shim runs once at boot; remove when BillGameCore ships its own default theme.
+
+7. **Lobby UI is placeholder for D.U3a — Bill's full vision deferred.** After visual check Bill confirmed shipped panel is acceptable but called out his polish vision: each weapon as an icon card (not a text row), hover tooltip showing full stats + skill descriptions, drag-and-drop onto a player-slot weapon socket. Captured as memory + tracked as a future "lobby polish" lát (likely between D.U3 and D.U4, or rolled into D.U7 juice). Do NOT retrofit into D.U3a — that lát closed on the placeholder.
+
 ---
 
 ## Bill checkpoints — what happened
@@ -86,7 +93,7 @@ The client side is fully ready; D.U3b is purely an integration verification.
 
 ## Known baseline (NOT D.U3 issues)
 
-- 3× `No Theme Style Sheet set to PanelSettings` — BillGameCore framework (`UIService.Initialize`, `DebugOverlay`, `CheatConsole`). D.U1 carryover.
+- 3× `No Theme Style Sheet set to PanelSettings` — BillGameCore framework (`UIService.Initialize`, `DebugOverlay`, `CheatConsole`). D.U1 carryover; D.U3 patches the `Bill.UI` one at runtime (§2.6) but the warning still fires from framework boot order. DebugOverlay + CheatConsole stay unpatched (not user-facing).
 - 1× `Missing types referenced from UniversalRenderPipelineGlobalSettings` — URP downgrade leftover. D.U1 carryover.
 - 3× `CS0618 PlayerSettings.GetScriptingDefineSymbolsForGroup obsolete` (warning, not error) — `Assets/BillGameCore/Editor/BillSetupWizard.cs`. Pre-existing BillGameCore framework code; not introduced by D.U3.
 
@@ -99,10 +106,12 @@ The client side is fully ready; D.U3b is purely an integration verification.
 | `Assets/RadiantArena/Scripts/Net/ArenaContext.cs` | +47 | edit (WeaponSnapshot + AvailableWeapons hydration) |
 | `Assets/RadiantArena/UI/Resources/LobbyPanel.uxml` | 32 | new |
 | `Assets/RadiantArena/UI/Resources/lobby.uss` | 170 | new |
+| `Assets/RadiantArena/UI/Resources/ArenaRuntimeTheme.tss` | 14 | new (post-visual-check, §2.6) |
 | `Assets/RadiantArena/UI/LobbyPanel.cs` | 164 | new |
 | `Assets/RadiantArena/Scripts/States/LobbyState.cs` | 93 | new |
 | `Assets/RadiantArena/Scripts/States/ConnectingState.cs` | edit (+phase routing) | |
 | `Assets/RadiantArena/Scripts/States/ArenaStates.cs` | edit (+1 line) | |
+| `Assets/RadiantArena/Scripts/Bootstrap/ArenaBootstrap.cs` | edit (+ApplyArenaRuntimeTheme, §2.6) | |
 
 Stage 1 docs (PLAN + SUBTASKS + OPUS_PROMPTS): ~930 lines under `arena-unity/tasks/todo/D.U3-lobby-panel/`.
 
