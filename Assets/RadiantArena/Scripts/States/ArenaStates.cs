@@ -15,6 +15,7 @@ namespace RadiantArena.States
         {
             Bill.State.AddState(new BootState());
             Bill.State.AddState(new ConnectingState());
+            Bill.State.AddState(new LobbyState());
         }
     }
 }
