@@ -1,6 +1,7 @@
 #nullable enable
 using BillGameCore;
 using RadiantArena.Events;
+using RadiantArena.States;
 using UnityEngine;
 
 namespace RadiantArena.Bootstrap {
@@ -13,6 +14,9 @@ namespace RadiantArena.Bootstrap {
         void InitArena() {
             Debug.Log($"[Arena] bootstrap ready (Bill.IsReady={Bill.IsReady})");
             Bill.Events.Fire(new ArenaBootstrapReadyEvent());
+
+            ArenaStates.Register();
+            Bill.State.GoTo<RadiantArena.States.BootState>();
         }
     }
 }
