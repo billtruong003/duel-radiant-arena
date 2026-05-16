@@ -1,6 +1,6 @@
-# D.U1 — Bootstrap · SONNET_PROMPTS
+# D.U1 — Bootstrap · opus_PROMPTS
 
-> Self-contained prompts cho Bill paste sequential vào Sonnet session. **1 sub per invocation.** Sonnet làm xong sub → STOP → Bill paste sub tiếp.
+> Self-contained prompts cho Bill paste sequential vào opus session. **1 sub per invocation.** opus làm xong sub → STOP → Bill paste sub tiếp.
 > Source detail: `SUBTASKS.md`. Architecture: `PLAN.md`.
 
 ---
@@ -316,6 +316,6 @@ KHÔNG commit. Đợi Opus session viết REPORT.md → Move qua `tasks/done/D.U
 | Sub 9 | Review log output, switch Opus session for REPORT + Move |
 
 ## Notes
-- Mỗi prompt self-contained — Sonnet session reset OK, full context từ Read prereqs.
+- Mỗi prompt self-contained — opus session reset OK, full context từ Read prereqs.
 - Pre-commit hook fail → fix root, NEW commit (KHÔNG `--amend` per Bash guidance).
 - MCP unavailable mọi sub → báo Bill, KHÔNG silent manual fallback.
