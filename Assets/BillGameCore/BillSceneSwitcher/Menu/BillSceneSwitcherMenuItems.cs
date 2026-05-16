@@ -1,6 +1,8 @@
 #if UNITY_EDITOR
 using UnityEditor;
+#if UNITY_6000_3_OR_NEWER
 using UnityEditor.Toolbars;
+#endif
 
 namespace BillGameCore.BillSceneSwitcher
 {
@@ -30,7 +32,9 @@ namespace BillGameCore.BillSceneSwitcher
         static void ToggleToolbar()
         {
             BillSceneSwitcherPrefs.ShowInToolbar = !BillSceneSwitcherPrefs.ShowInToolbar;
+#if UNITY_6000_3_OR_NEWER
             MainToolbar.Refresh("BillGameCore/Scene Switcher");
+#endif
         }
 
         [MenuItem(Root + "Show Toolbar Button", true, 100)]
@@ -76,7 +80,9 @@ namespace BillGameCore.BillSceneSwitcher
         static void ToggleDisable()
         {
             BillSceneSwitcherPrefs.Enabled = !BillSceneSwitcherPrefs.Enabled;
+#if UNITY_6000_3_OR_NEWER
             MainToolbar.Refresh("BillGameCore/Scene Switcher");
+#endif
         }
 
         [MenuItem(Root + "Disable Scene Switcher", true, 10000)]

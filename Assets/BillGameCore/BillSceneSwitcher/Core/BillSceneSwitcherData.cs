@@ -105,7 +105,7 @@ namespace BillGameCore.BillSceneSwitcher
         // Persistence
         // ───────────────────────────────────────────
 
-        public void SetDirty() => EditorUtility.SetDirty(this);
+        public new void SetDirty() => EditorUtility.SetDirty(this);
 
         public void Save()
         {

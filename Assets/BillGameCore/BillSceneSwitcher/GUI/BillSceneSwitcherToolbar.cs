@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+#if UNITY_6000_3_OR_NEWER
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -9,8 +10,10 @@ using UnityEngine.SceneManagement;
 namespace BillGameCore.BillSceneSwitcher
 {
     /// <summary>
-    /// Scene Switcher toolbar dropdown using Unity 6 MainToolbar API.
+    /// Scene Switcher toolbar dropdown using Unity 6.3+ MainToolbar API.
     /// Appears as a dropdown button in the main toolbar showing the active scene name.
+    /// On Unity 6.2 and earlier this class is compiled out — use the menu items
+    /// (BillGameCore > Scene Switcher) to open the panel instead.
     /// </summary>
     public static class BillSceneSwitcherToolbar
     {
@@ -97,4 +100,5 @@ namespace BillGameCore.BillSceneSwitcher
         }
     }
 }
-#endif
+#endif // UNITY_6000_3_OR_NEWER
+#endif // UNITY_EDITOR
