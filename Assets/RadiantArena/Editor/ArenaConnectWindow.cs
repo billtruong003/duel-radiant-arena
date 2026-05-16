@@ -6,6 +6,13 @@
 // Interim tool until arena-server Lát D.3 ships the admin endpoint
 // (POST /admin/create-room) — when that's available, NetClient can derive
 // roomId + token from a single bot-issued URL and this window goes away.
+//
+// History: this file was originally ManualRoomConnect.cs but Unity's MonoScript
+// asset cache for that filename's GUID got into a broken state where the file
+// would not compile into Assembly-CSharp-Editor even after deleting+regenerating
+// the .meta. Renaming the type + filename to ArenaConnectWindow gave it a fresh
+// GUID and fixed the compile. Tracked as a Unity quirk; no code change beyond
+// the type rename was needed.
 
 using System;
 using RadiantArena.Net;
@@ -14,7 +21,7 @@ using UnityEngine;
 
 namespace RadiantArena.Editor
 {
-    public class ManualRoomConnect : EditorWindow
+    public class ArenaConnectWindow : EditorWindow
     {
         const string PrefWsUrl = "RadiantArena.WsUrl";
         const string PrefRoomId = "RadiantArena.RoomId";
@@ -27,14 +34,13 @@ namespace RadiantArena.Editor
         string _sessionId = "test_session_001";
         string _discordId = "bill_test_001";
         string _secret = "";
-
         string _tokenPreview = "";
         Vector2 _scroll;
 
-        [MenuItem("Window/Radiant Arena/Manual Room Connect")]
+        [MenuItem("Window/Radiant Arena/Connect")]
         static void Open()
         {
-            var win = GetWindow<ManualRoomConnect>("Arena Connect");
+            var win = GetWindow<ArenaConnectWindow>("Arena Connect");
             win.minSize = new Vector2(420, 320);
             win.Show();
         }
@@ -63,7 +69,7 @@ namespace RadiantArena.Editor
         {
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
 
-            EditorGUILayout.LabelField("Radiant Arena — Manual Room Connect", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Radiant Arena — Manual Connect", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
                 "1. Start arena-server (pnpm dev → ws://localhost:2567)\n" +
                 "2. Set ARENA_TOKEN_SECRET below to match server's .env\n" +
@@ -107,10 +113,11 @@ namespace RadiantArena.Editor
                 }
             }
 
-            using (new EditorGUI.DisabledScope(!Application.isPlaying
-                                              || string.IsNullOrEmpty(_tokenPreview)
-                                              || _tokenPreview.StartsWith("<error")
-                                              || string.IsNullOrEmpty(_roomId)))
+            bool canConnect = Application.isPlaying
+                              && !string.IsNullOrEmpty(_tokenPreview)
+                              && !_tokenPreview.StartsWith("<error")
+                              && !string.IsNullOrEmpty(_roomId);
+            using (new EditorGUI.DisabledScope(!canConnect))
             {
                 if (GUILayout.Button("Connect"))
                 {

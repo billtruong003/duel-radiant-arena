@@ -31,6 +31,26 @@ Final Play-mode log (Editor, no URL query, no ManualRoomConnect invoked):
 Errors: 3× `No Theme Style Sheet set to PanelSettings` + 1× URP missing-types —
 all baseline carryovers from D.U1, NOT introduced by D.U2.
 
+### Deep smoke (post-Sub 11, drove via `mcp__unityMCP__execute_code` reflection):
+
+```
+[DeepSmoke] Token minted (189 chars)
+[DeepSmoke] NetClient.Instance OK
+[DeepSmoke] ConnectionInfo built
+[DeepSmoke] ConnectAsync invoked — waiting for NetErrorEvent ...
+[Arena.Net] Connecting to ws://localhost:2567 room=BOGUS_ROOM_999 as did=deep_smoke_bill ...
+[Arena.Net] Join failed: Cannot connect to destination host
+```
+
+Proven end-to-end without arena-server actually running:
+1. DevTokenSigner.SignToken → 189-char `<b64>.<hex>` token, format verified.
+2. NetClient.Instance singleton survives Play mode entry.
+3. NetClient.ConnectAsync invokes Colyseus.Client.JoinById against `ws://localhost:2567`.
+4. Colyseus SDK actually attempts the WebSocket → got "Cannot connect to destination host" (port not listening).
+5. NetClient catch block fires `NetErrorEvent { code=JOIN_FAILED, message="Cannot connect to destination host" }`.
+
+This validates the entire wire-up Bill.Events → NetClient → Colyseus → catch → Event without depending on a live server. Real 2-instance smoke (D.U2b) only needs server D.3 + D.4 to land — the client side is locked in.
+
 ---
 
 ## Sub-by-sub status
@@ -44,7 +64,7 @@ all baseline carryovers from D.U1, NOT introduced by D.U2.
 | 5. ArenaEvents.cs extend | ✅ | `7f50c7c` | 5 new events: `NetConnected/NetDisconnected/NetError/PhaseChanged/InitialStateReceived`. |
 | 6. ConnectionInfo + UrlParser | ✅ | `491e87e` | WebGL-safe manual query parse, no System.Web. |
 | 7. NetClient.cs (main artifact) | ✅ | `f247582` | Fail-closed ConnectAsync, OnStateChange→Hydrate+events, OnLeave reset. |
-| 8. DevTokenSigner + ManualRoomConnect | ✅ | `e63c72d` | Editor-only via folder convention (no asmdef — see §2 deviation 3). |
+| 8. DevTokenSigner + ManualRoomConnect | ✅ | `e63c72d` + rename | DevTokenSigner OK first try. EditorWindow renamed `ManualRoomConnect → ArenaConnectWindow` to dodge a stale-MonoScript-cache compile-drop quirk (see §2 deviation 8). Editor-only via folder convention (no asmdef — see §2 deviation 3). |
 | 9. BootState + ConnectingState + ArenaStates | ✅ | `87e883c` | CS0104 ambiguity with `BillGameCore.BootState` fixed via FQN. |
 | 10. Wire [NetClient] GO | ✅ | `c9b6220` | MCP `manage_gameobject` + `manage_scene save`. 4 root GOs total. |
 | 11. Smoke verify (no commit) | ✅ | — | Full log chain captured. Boot stays in Boot (Editor expected path). |
@@ -99,6 +119,25 @@ all baseline carryovers from D.U1, NOT introduced by D.U2.
 7. **`MapSchema<T>.Keys` is non-generic `ICollection`.** `HydrateFrom`
    iterates via `foreach (var keyObj in state.players.Keys)` with an explicit
    `keyObj is string key` cast. Saves a few cycles vs LINQ-cast every diff.
+
+8. **`ManualRoomConnect.cs` failed to compile silently — renamed to `ArenaConnectWindow.cs`.**
+   The original EditorWindow file `ManualRoomConnect.cs` (committed in `e63c72d`)
+   would not compile into `Assembly-CSharp-Editor` despite zero CS errors in the
+   console. `UnityEditor.AssetDatabase.LoadAssetAtPath<MonoScript>` returned a
+   MonoScript with `text.Length == 5952` but `GetClass() == null` — Unity could
+   read the source but the type never appeared in the compiled assembly.
+   `DevTokenSigner.cs` in the same folder, same .meta shape, compiled fine.
+   Tried: delete + regenerate .meta, `AssetDatabase.ImportAsset(ForceUpdate)`,
+   `CompilationPipeline.RequestScriptCompilation(CleanBuildCache)`, Write-tool
+   rewrite (vs Edit-tool patch). None recovered. Theory: a stale MonoScript /
+   incremental-compile cache entry tied to the file's GUID. Workaround: delete
+   the file (`ManualRoomConnect.cs` + `.meta`) and recreate as
+   `ArenaConnectWindow.cs` with class `RadiantArena.Editor.ArenaConnectWindow`
+   + menu path `Window/Radiant Arena/Connect`. Fresh GUID → fresh MonoScript →
+   compiled cleanly first try and the menu item now opens correctly.
+
+   Filed mentally as a Unity 6000.2.7f2 quirk. If it recurs in another lát,
+   the fix is the same: rename the file + the type.
 
 ---
 
@@ -159,7 +198,7 @@ Both pre-existed in D.U1 REPORT.md.
 | `Assets/RadiantArena/Scripts/States/ArenaStates.cs` | 22 |
 | `Assets/RadiantArena/Scripts/Bootstrap/ArenaBootstrap.cs` | edit (+3 lines) |
 | `Assets/RadiantArena/Editor/DevTokenSigner.cs` | 61 |
-| `Assets/RadiantArena/Editor/ManualRoomConnect.cs` | 151 |
+| `Assets/RadiantArena/Editor/ArenaConnectWindow.cs` | 152 | (was `ManualRoomConnect.cs` in `e63c72d`; renamed post-smoke per §2.8) |
 | `Assets/RadiantArena/Scenes/Bootstrap.unity` | scene edit (+[NetClient] GO) |
 
 ~9 commits + Stage 1 docs commit + this REPORT commit = 11 D.U2 commits total.
