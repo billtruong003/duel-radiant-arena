@@ -42,3 +42,8 @@ Thumbs.db
 .claude/
 # winget leftover
 winget
+# Local history (VS Code Local History extension)
+.lh/
+# MCP for Unity runtime logs (regenerated per session)
+/Assets/UnityMCP/
+/Assets/UnityMCP.meta
