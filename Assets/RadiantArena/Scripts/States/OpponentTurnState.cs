@@ -2,14 +2,15 @@
 using System;
 using BillGameCore;
 using RadiantArena.Events;
+using RadiantArena.UI;
 using UnityEngine;
 
 namespace RadiantArena.States
 {
     /// <summary>
-    /// Opponent's turn — Sub 3 skeleton. Sub 7 activates:
-    ///   - Open TurnInputPanel (Spectator mode).
-    /// Skeleton listens for phase=animating to transition.
+    /// Opponent's turn. Open TurnInputPanel in Spectator mode (power gauge
+    /// hidden via .spectator USS class, hint text swapped). No input — just
+    /// wait for phase=animating (opponent fired or timeout).
     /// </summary>
     public class OpponentTurnState : GameState
     {
@@ -17,7 +18,9 @@ namespace RadiantArena.States
 
         public override void Enter()
         {
-            Debug.Log("[Arena.OpponentTurn] Enter (skeleton — Sub 7 activates spectator panel)");
+            Debug.Log("[Arena.OpponentTurn] Enter — spectator panel");
+            Bill.UI.Open<TurnInputPanel>(p => p.SetMode(TurnMode.Spectator));
+
             _onPhase = e =>
             {
                 if (e.newPhase == "animating") Bill.State.GoTo<AnimatingState>();
@@ -29,6 +32,7 @@ namespace RadiantArena.States
         {
             if (_onPhase != null) Bill.Events.Unsubscribe(_onPhase);
             _onPhase = null;
+            Bill.UI.Close<TurnInputPanel>();
         }
     }
 }
