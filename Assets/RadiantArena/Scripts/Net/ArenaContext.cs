@@ -18,6 +18,9 @@ namespace RadiantArena.Net
         public static string SessionId { get; set; } = "";
         public static string CurrentPhase { get; set; } = "waiting";
         public static int CurrentRound { get; set; } = 0;
+        public static string TurnPlayerId { get; set; } = "";
+        /// <summary>Epoch ms — server enforces actual timeout. UI displays local countdown.</summary>
+        public static long TurnDeadlineAt { get; set; } = 0;
         public static PlayerSnapshot? MyPlayer { get; private set; }
         public static PlayerSnapshot? OpponentPlayer { get; private set; }
 
@@ -30,6 +33,8 @@ namespace RadiantArena.Net
             SessionId = state.session_id;
             CurrentPhase = state.phase;
             CurrentRound = state.round;
+            TurnPlayerId = state.turn_player_id ?? "";
+            TurnDeadlineAt = state.turn_deadline_at;
 
             MyPlayer = null;
             OpponentPlayer = null;
@@ -60,6 +65,8 @@ namespace RadiantArena.Net
             SessionId = "";
             CurrentPhase = "waiting";
             CurrentRound = 0;
+            TurnPlayerId = "";
+            TurnDeadlineAt = 0;
             MyPlayer = null;
             OpponentPlayer = null;
             // MyDiscordId preserved — set by BootState / ManualRoomConnect,

@@ -47,4 +47,29 @@ namespace RadiantArena.Events
     {
         public string sessionId;
     }
+
+    /// <summary>Fired when a new turn starts (server transitioned to phase=active). Carries which player + deadline.</summary>
+    public struct TurnStartedEvent : IEvent
+    {
+        public string turnPlayerId;
+        public long deadlineAt;
+        public int round;
+    }
+
+    /// <summary>Fired every frame while dragging during my turn. Power 0..1, angle in radians.</summary>
+    public struct AimUpdatedEvent : IEvent
+    {
+        public float angle;
+        public float power;
+    }
+
+    /// <summary>Fired when drag-aim is canceled or completed. Panel resets power gauge.</summary>
+    public struct AimClearedEvent : IEvent { }
+
+    /// <summary>Fired by ArenaAimController on valid shot release (power past dead zone). MyTurnState routes to NetClient.Send.</summary>
+    public struct ShotReleasedEvent : IEvent
+    {
+        public float angle;
+        public float power;
+    }
 }
