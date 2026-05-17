@@ -77,12 +77,8 @@ namespace RadiantArena.States
         {
             if (e.newPhase == "countdown")
             {
-                Debug.Log("[Arena.Lobby] phase -> countdown (CountdownState deferred to D.U4 — staying in Lobby for now)");
-                // D.U4: Bill.State.GoTo<CountdownState>();
-            }
-            else if (e.newPhase == "active")
-            {
-                Debug.Log("[Arena.Lobby] phase -> active (TurnInput deferred to D.U4)");
+                Debug.Log("[Arena.Lobby] phase -> countdown, transitioning to CountdownState");
+                Bill.State.GoTo<CountdownState>();
             }
             else if (e.newPhase == "ended")
             {
