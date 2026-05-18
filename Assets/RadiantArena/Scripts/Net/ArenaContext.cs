@@ -31,6 +31,15 @@ namespace RadiantArena.Net
         public static int LastShotDamage { get; set; } = 0;
         public static bool LastShotCrit { get; set; } = false;
 
+        /// <summary>
+        /// Last server-broadcast match_ended snapshot — set by NetClient.OnMatchEnded,
+        /// consumed by EndState (race fallback if message lands before Enter).
+        /// </summary>
+        public static string LastMatchWinnerId { get; set; } = "";
+        public static string LastMatchOutcome { get; set; } = "";
+        public static System.Collections.Generic.Dictionary<string, int> LastMatchFinalHp { get; set; }
+            = new System.Collections.Generic.Dictionary<string, int>();
+
         public static PlayerSnapshot? MyPlayer { get; private set; }
         public static PlayerSnapshot? OpponentPlayer { get; private set; }
 
@@ -81,6 +90,9 @@ namespace RadiantArena.Net
             LastShooterId = "";
             LastShotDamage = 0;
             LastShotCrit = false;
+            LastMatchWinnerId = "";
+            LastMatchOutcome = "";
+            LastMatchFinalHp = new System.Collections.Generic.Dictionary<string, int>();
             MyPlayer = null;
             OpponentPlayer = null;
             // MyDiscordId preserved — set by BootState / ManualRoomConnect,

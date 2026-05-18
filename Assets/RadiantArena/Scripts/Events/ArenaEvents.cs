@@ -116,4 +116,31 @@ namespace RadiantArena.Events
         public string shooterId;
         public int totalDamage;
     }
+
+    /// <summary>
+    /// Fired by NetClient when a player's hp changes in the state diff. Snapshots
+    /// the (player, old, new, max) into a plain-C# payload so HudPanel never reads
+    /// the live Colyseus schema. D.U6 HudPanel subscribes; D.U7 juice can subscribe
+    /// to drive flash / shake.
+    /// </summary>
+    public struct HpChangedEvent : IEvent
+    {
+        public string playerId;
+        public int oldHp;
+        public int newHp;
+        public int hpMax;
+    }
+
+    /// <summary>
+    /// Fired by NetClient on "match_ended" inbound. Plain-C# snapshot of the
+    /// server payload. EndState opens ResultPanel from this; ArenaContext.LastMatch*
+    /// caches as race-fallback if event arrives before EndState.Enter.
+    /// </summary>
+    public struct MatchEndedEvent : IEvent
+    {
+        public string winnerId;
+        /// <summary>'' | 'win' | 'timeout_join' | 'double_afk' | 'disconnect' | 'concede'</summary>
+        public string outcome;
+        public System.Collections.Generic.Dictionary<string, int> finalHp;
+    }
 }
