@@ -21,6 +21,16 @@ namespace RadiantArena.Net
         public static string TurnPlayerId { get; set; } = "";
         /// <summary>Epoch ms — server enforces actual timeout. UI displays local countdown.</summary>
         public static long TurnDeadlineAt { get; set; } = 0;
+
+        /// <summary>
+        /// Last server-broadcast trajectory snapshot — set by NetClient.OnShotResolved,
+        /// consumed by AnimatingState (race fallback if message lands before Enter).
+        /// </summary>
+        public static TrajectoryPoint[] LastTrajectory { get; set; } = System.Array.Empty<TrajectoryPoint>();
+        public static string LastShooterId { get; set; } = "";
+        public static int LastShotDamage { get; set; } = 0;
+        public static bool LastShotCrit { get; set; } = false;
+
         public static PlayerSnapshot? MyPlayer { get; private set; }
         public static PlayerSnapshot? OpponentPlayer { get; private set; }
 
@@ -67,11 +77,30 @@ namespace RadiantArena.Net
             CurrentRound = 0;
             TurnPlayerId = "";
             TurnDeadlineAt = 0;
+            LastTrajectory = System.Array.Empty<TrajectoryPoint>();
+            LastShooterId = "";
+            LastShotDamage = 0;
+            LastShotCrit = false;
             MyPlayer = null;
             OpponentPlayer = null;
             // MyDiscordId preserved — set by BootState / ManualRoomConnect,
             // survives reconnect attempts in the same Editor session.
         }
+    }
+
+    /// <summary>
+    /// Plain-C# copy of TrajectoryPointSchema. Used by ShotResolvedEvent +
+    /// TrajectoryRenderer so gameplay code never holds a reference to the
+    /// live Colyseus schema (which the server may mutate between frames).
+    /// </summary>
+    public struct TrajectoryPoint
+    {
+        /// <summary>ms since shoot (server-side clock).</summary>
+        public ushort t;
+        public float x;
+        public float y;
+        /// <summary>'' | 'wall_bounce' | 'pierce_player' | 'hit:&lt;dmg&gt;' | 'crit:&lt;dmg&gt;' | 'stop'</summary>
+        public string evt;
     }
 
     /// <summary>
