@@ -50,8 +50,13 @@ namespace RadiantArena.Juice
 
         void OnDestroy()
         {
-            if (_onHit != null) Bill.Events.Unsubscribe(_onHit);
-            if (_onWall != null) Bill.Events.Unsubscribe(_onWall);
+            // Bill services may be torn down before our OnDestroy fires (Play
+            // exit). Guard with IsReady to avoid SERVICE NOT FOUND noise.
+            if (Bill.IsReady)
+            {
+                if (_onHit  != null) Bill.Events.Unsubscribe(_onHit);
+                if (_onWall != null) Bill.Events.Unsubscribe(_onWall);
+            }
             _onHit = null;
             _onWall = null;
             if (Instance == this) Instance = null;
