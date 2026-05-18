@@ -194,5 +194,5 @@ Persona: SKILL.md. Lát D.U8 Sub 7.
 | Sub 7 | Visual sign-off — Bill sees arena, capsules, drag-aim from me-capsule. Closes D.U8. |
 
 ## Notes
-- Roadmap shift: original D.U8 (weapon prefabs) → D.U11; new D.U12 = UI fantasy polish. Document in REPORT + update ROADMAP/TASKS during Stage 5 close.
+- Roadmap shift applied pre-Sub-1: D.U9 = weapon prefabs (was D.U8), D.U10 = UI fantasy polish (new), D.U11 = HLSL shaders (was D.U9), D.U12 = WebGL deploy LAST (was D.U10). ROADMAP.md + TASKS.md committed before Sub 1.
 - Pre-commit hook fail → NEW commit per global rule.

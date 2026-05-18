@@ -1,7 +1,7 @@
 # D.U8 — Arena scene (map + players + camera) · PLAN
 
 > Stage 1 (Architect). Bill pivot 2026-05-18: skip per-feature polish, get to **visible combat** ASAP.
-> Original `D.U8 — Weapon prefabs` deferred to a future Lát (D.U11 or similar).
+> Original `D.U8 — Weapon prefabs` deferred to D.U9 (renumbered after pivot — deploy pushed to D.U12 LAST).
 > Executor: Opus 4.7 sequential auto-run.
 
 ---
@@ -37,11 +37,11 @@ This Lát is **client-only and runtime-only**. No server-side dependency, no ass
 | Build Settings: Bootstrap.unity as Scene 0 | ✅ GO | Edit `EditorBuildSettings.scenes` via Editor script or `mcp__unityMCP__manage_editor` (whichever works). Without this, Play loads whatever's currently active (SampleScene today). |
 | Mock smoke | ✅ GO | Enter Play, verify Main Camera config, find_gameobjects ground + walls + 2 capsules, check `MyPlayerVisual` reference set on ArenaSceneBuilder, drive into MyTurn, verify drag-aim controller origin = MyVisual.transform. |
 | **OUT OF SCOPE — defer to later Láts** | | |
-| 6-weapon prefab catalog (the original D.U8) | ❌ | New Lát "D.U11 — Weapon prefabs" or similar. Today's capsules use no weapon attachment. |
-| WeaponHueApplier / WeaponPrefabRegistry | ❌ | Same Lát as catalog. |
-| HLSL toon/outline shaders | ❌ D.U9 | |
-| UI fantasy polish (calligraphic font, ink overlay, tier color) | ❌ Future Lát | Bill flagged interest — separate scope. |
-| WebGL deploy | ❌ D.U10 | |
+| 6-weapon prefab catalog (the original D.U8) | ❌ D.U9 | Today's capsules use no weapon attachment. |
+| WeaponHueApplier / WeaponPrefabRegistry | ❌ D.U9 | Same Lát as catalog. |
+| UI fantasy polish (calligraphic font, ink overlay, tier color) | ❌ D.U10 | Bill flagged interest — separate scope. |
+| HLSL toon/outline shaders | ❌ D.U11 | |
+| WebGL deploy | ❌ D.U12 (LAST) | Deploy is the final numbered Lát per Bill order rule. |
 | Real server HP/position drive | ❌ Server D.5 | PlayerVisual reads ArenaContext; today server leaves x/y=0 until physics ships. Fallback to slot position covers that. |
 | Animations / IK / player rigs | ❌ Future | Capsule placeholder is intentional. |
 | Audio (footstep, ambient) | ❌ D.U7b | |
@@ -237,17 +237,19 @@ Bill enters Play (with Build Settings fix in place — Bootstrap.unity loads aut
 
 ---
 
-## 12. Roadmap impact (will update post-close)
+## 12. Roadmap impact (applied 2026-05-18, pre-Sub-1)
 
-Updated priority order after this Lát:
+Updated priority order — **deploy moved to LAST per Bill order rule**:
 
 | # | Lát | Folder | Status |
 |---|---|---|---|
-| 1-7 | D.U1 – D.U7 | done/ | ✅ |
-| 8 | **D.U8 — Arena scene (this Lát)** | todo/D.U8-arena-scene/ | 🟡 in progress |
-| 9 | D.U9 — HLSL shaders | todo/D.U9-shaders/ | unchanged |
-| 10 | D.U10 — WebGL build + deploy | todo/D.U10-webgl-deploy/ | unchanged |
-| 11 | D.U11 — Weapon prefab catalog (was D.U8) | (not yet created) | new |
-| 12 | D.U12 — UI fantasy polish (calligraphic / ink / tier colors) | (not yet created) | new |
+| 1-7 | D.U1 – D.U7 | `tasks/done/` | ✅ closed |
+| 8 | **D.U8 — Arena scene (this Lát)** | `tasks/todo/D.U8-arena-scene/` | 🟡 in progress |
+| 9 | D.U9 — Weapon prefab catalog (was D.U8 pre-pivot) | `tasks/todo/D.U9-weapon-prefabs/` | ⬜ |
+| 10 | D.U10 — UI fantasy polish (new) | `tasks/todo/D.U10-ui-polish/` | ⬜ |
+| 11 | D.U11 — HLSL shaders (was D.U9 pre-pivot) | `tasks/todo/D.U11-shaders/` | ⬜ |
+| 12 | D.U12 — WebGL deploy LAST (was D.U10 pre-pivot) | `tasks/todo/D.U12-webgl-deploy/` | ⬜ |
+| 13* | D.U13 — Replay viewer (optional, was D.U11 pre-pivot) | not yet created | ⬜ |
+| 14* | D.U14 — PvE mode (optional, was D.U12 pre-pivot) | not yet created | ⬜ |
 
-`arena-unity/ROADMAP.md` + `TASKS.md` updates in Stage 5 close (alongside folder move to done/).
+ROADMAP.md + TASKS.md updated pre-Sub-1 (Bill 2026-05-18 instruction to settle phase order before execute).

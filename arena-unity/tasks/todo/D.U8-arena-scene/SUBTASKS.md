@@ -420,4 +420,4 @@ namespace RadiantArena.EditorTools
 - [ ] Sub 6 BuildSettingsFixer menu landed.
 - [ ] Sub 7 mock smoke + Bill visual sign-off.
 
-Roadmap update in REPORT: original D.U8 (weapon prefabs) becomes D.U11; new D.U12 = UI fantasy polish. Update `arena-unity/ROADMAP.md` + `TASKS.md` as Stage 5.
+Roadmap already applied pre-Sub-1 (Bill 2026-05-18): D.U9 = weapon prefabs (was D.U8), D.U10 = UI fantasy polish (new), D.U11 = HLSL shaders (was D.U9), D.U12 = WebGL deploy LAST (was D.U10). ROADMAP.md + TASKS.md committed before Sub 1.
