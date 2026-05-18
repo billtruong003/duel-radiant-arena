@@ -94,8 +94,7 @@ namespace RadiantArena.Net
             // Inbound messages — stubs for D.U2a; D.U3+ replaces with real handlers.
             Room.OnMessage<MatchStartMessage>("match_start",
                 _ => Debug.Log("[Arena.Net] match_start (no handler — D.U4+)"));
-            Room.OnMessage<ShotResolvedMessage>("shot_resolved",
-                _ => Debug.Log("[Arena.Net] shot_resolved (no handler — D.U5)"));
+            Room.OnMessage<ShotResolvedMessage>("shot_resolved", OnShotResolved);
             Room.OnMessage<TurnSwitchedMessage>("turn_switched",
                 _ => Debug.Log("[Arena.Net] turn_switched (no handler — D.U4)"));
             Room.OnMessage<SignatureUsedMessage>("signature_used",
@@ -139,6 +138,49 @@ namespace RadiantArena.Net
             _lastPhase = "";
             ArenaContext.Reset();
             Bill.Events.Fire(new NetDisconnectedEvent { code = code, reason = $"OnLeave code={code}" });
+        }
+
+        void OnShotResolved(ShotResolvedMessage m)
+        {
+            // Snapshot the live Colyseus schema array into a plain-C# DTO so
+            // gameplay code never holds onto a reference the server mutates.
+            var raw = m.trajectory;
+            TrajectoryPoint[] points;
+            if (raw == null || raw.Length == 0)
+            {
+                points = System.Array.Empty<TrajectoryPoint>();
+            }
+            else
+            {
+                points = new TrajectoryPoint[raw.Length];
+                for (int i = 0; i < raw.Length; i++)
+                {
+                    var p = raw[i];
+                    if (p == null) continue;
+                    points[i] = new TrajectoryPoint
+                    {
+                        t = p.t,
+                        x = p.x,
+                        y = p.y,
+                        evt = p.@event ?? string.Empty,
+                    };
+                }
+            }
+
+            ArenaContext.LastTrajectory = points;
+            ArenaContext.LastShooterId = m.shooter ?? "";
+            ArenaContext.LastShotDamage = Mathf.RoundToInt(m.damage_dealt);
+            ArenaContext.LastShotCrit = m.crit;
+
+            Debug.Log($"[Arena.Net] shot_resolved — points={points.Length} shooter={m.shooter} dmg={m.damage_dealt} crit={m.crit}");
+
+            Bill.Events.Fire(new ShotResolvedEvent
+            {
+                points = points,
+                shooterId = m.shooter ?? "",
+                damage = Mathf.RoundToInt(m.damage_dealt),
+                crit = m.crit,
+            });
         }
 
         public void Send(string type, object payload)
