@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BillGameCore;
 using Colyseus;
+using Client = Colyseus.ColyseusClient;
 using RadiantArena.Events;
 using UnityEngine;
 
@@ -26,7 +27,7 @@ namespace RadiantArena.Net
     {
         public static NetClient? Instance { get; private set; }
 
-        public Room<DuelState>? Room { get; private set; }
+        public ColyseusRoom<DuelState>? Room { get; private set; }
         public bool IsConnected => Room != null;
         public ConnectionInfo CurrentInfo { get; private set; }
 

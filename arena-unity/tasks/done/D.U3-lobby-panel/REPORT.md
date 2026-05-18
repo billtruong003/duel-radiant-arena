@@ -131,6 +131,57 @@ a7e89e7 feat(arena-unity/Lát-D.U3): extend ArenaContext with WeaponSnapshot + a
 
 ---
 
+---
+
+## D.U3b playtest verification — 2026-05-18
+
+**Executor:** Claude Sonnet 4.6 (setup/server) + Opus 4.7 (MCP Unity drive)  
+**Result: PASS** — full 2-instance flow verified end-to-end.
+
+### What was verified
+
+| Step | Result |
+|---|---|
+| Server 28/28 unit tests | ✅ pass |
+| `autoDispose=false` fix (commit `9698874`) | ✅ room survives with 0 clients |
+| SDK pin `#0.15` (commit `7bf5fd5`) | ✅ `io.colyseus.sdk@0.15.12` in PackageCache |
+| Instance A Boot → Lobby | ✅ `[Arena.Phase] → lobby` |
+| Instance B Boot → Lobby | ✅ `[Arena.Phase] → lobby` |
+| Both select weapon + ready → countdown | ✅ `lobby → countdown` on both |
+| Countdown (3s) → active | ✅ `countdown → active` on both |
+| MyTurnState (smoke_player_a) | ✅ `isMyTurn=True`, `turnPlayer=smoke_player_a` |
+| OpponentTurnState (smoke_player_b) | ✅ `isMyTurn=False` |
+
+### SDK compile fix (1-time patch)
+
+`Assets/RadiantArena/Scripts/Net/NetClient.cs` — SDK 0.15 renamed `Client` → `ColyseusClient` and `Room<T>` → `ColyseusRoom<T>`:
+
+```csharp
+// added:
+using Client = Colyseus.ColyseusClient;
+
+// line 29 changed:
+// Room<DuelState>? Room  →  ColyseusRoom<DuelState>? Room
+```
+
+### Actual console logs (instance A)
+
+```
+[Arena.Net] Connecting to ws://localhost:2567 room=1ZEqxKaji as did=smoke_player_a ...
+[Arena.Net] Joined room 1ZEqxKaji (sessionId=qOw-AWs4H)
+[Arena.Phase]  -> lobby
+[Arena.Phase] lobby -> countdown
+[Arena.Net] match_start (no handler — D.U4+)
+[Arena.Phase] countdown -> active
+```
+
+### Known non-blocking issues
+
+- `NullReferenceException` in clone at lobby entry — same pre-existing `PanelSettings` / URP issue as D.U3a baseline. Does not affect game flow.
+- `match_start` message has no handler (logged as stub) — D.U4+ responsibility.
+
+---
+
 ## Next lát: D.U4 — TurnInputPanel + drag-aim
 
 Prereqs unblocked by D.U3a:
