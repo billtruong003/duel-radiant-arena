@@ -49,6 +49,6 @@
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0",
     "com.veriorpies.parrelsync": "https://github.com/VeriorPies/ParrelSync.git?path=/ParrelSync",
-    "io.colyseus.sdk": "https://github.com/colyseus/colyseus-unity-sdk.git?path=Assets/Colyseus"
+    "io.colyseus.sdk": "https://github.com/colyseus/colyseus-unity-sdk.git?path=Assets/Colyseus#0.15"
   }
 }
