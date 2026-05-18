@@ -33,6 +33,7 @@ namespace RadiantArena.States
             _onPhase = e =>
             {
                 if (e.newPhase == "animating") Bill.State.GoTo<AnimatingState>();
+                else if (e.newPhase == "ended") Bill.State.GoTo<EndState>();
             };
             _onShot = OnShotReleased;
             Bill.Events.Subscribe(_onPhase);

@@ -20,6 +20,7 @@ namespace RadiantArena.States
             Bill.State.AddState(new MyTurnState());
             Bill.State.AddState(new OpponentTurnState());
             Bill.State.AddState(new AnimatingState());
+            Bill.State.AddState(new EndState());
         }
     }
 }

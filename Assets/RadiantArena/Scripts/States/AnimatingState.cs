@@ -101,7 +101,8 @@ namespace RadiantArena.States
             }
             else if (e.newPhase == "ended")
             {
-                Debug.Log("[Arena.Animating] phase=ended (EndState deferred to D.U6)");
+                Debug.Log("[Arena.Animating] phase=ended → EndState");
+                Bill.State.GoTo<EndState>();
             }
         }
     }

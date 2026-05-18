@@ -21,6 +21,10 @@ namespace RadiantArena.States
 
         public override void Enter()
         {
+            // Defensive — close any leftover combat HUD/result if we re-entered Lobby after a match.
+            if (Bill.UI.IsOpen<HudPanel>())    Bill.UI.Close<HudPanel>();
+            if (Bill.UI.IsOpen<ResultPanel>()) Bill.UI.Close<ResultPanel>();
+
             var weapons = ArenaContext.MyPlayer != null
                 ? ArenaContext.MyPlayer.AvailableWeapons
                 : Array.Empty<WeaponSnapshot>();
@@ -82,7 +86,8 @@ namespace RadiantArena.States
             }
             else if (e.newPhase == "ended")
             {
-                Debug.Log("[Arena.Lobby] phase -> ended (EndState deferred to D.U6)");
+                Debug.Log("[Arena.Lobby] phase=ended → EndState");
+                Bill.State.GoTo<EndState>();
             }
         }
     }

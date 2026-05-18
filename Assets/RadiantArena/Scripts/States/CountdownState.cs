@@ -3,6 +3,7 @@ using System;
 using BillGameCore;
 using RadiantArena.Events;
 using RadiantArena.Net;
+using RadiantArena.UI;
 using UnityEngine;
 
 namespace RadiantArena.States
@@ -12,6 +13,9 @@ namespace RadiantArena.States
     /// players ready in lobby; then flips phase=active after COUNTDOWN_MS.
     /// Decides MyTurn vs OpponentTurn by reading ArenaContext.TurnPlayerId
     /// (server sets at countdown→active transition).
+    ///
+    /// D.U6: also opens HudPanel here (canonical combat HUD owner — stays open
+    /// through MyTurn/OpponentTurn/Animating, closed by EndState).
     /// </summary>
     public class CountdownState : GameState
     {
@@ -21,6 +25,7 @@ namespace RadiantArena.States
         {
             Debug.Log("[Arena.Countdown] Enter — server lock, awaiting phase=active");
             // D.U7 juice will add a CountdownPanel overlay with 3-2-1 big text.
+            if (!Bill.UI.IsOpen<HudPanel>()) Bill.UI.Open<HudPanel>();
             _onPhase = OnPhaseChanged;
             Bill.Events.Subscribe(_onPhase);
         }
@@ -33,12 +38,19 @@ namespace RadiantArena.States
 
         void OnPhaseChanged(PhaseChangedEvent e)
         {
-            if (e.newPhase != "active") return;
-            var amSelf = !string.IsNullOrEmpty(ArenaContext.TurnPlayerId)
-                         && ArenaContext.TurnPlayerId == ArenaContext.MyDiscordId;
-            Debug.Log($"[Arena.Countdown] phase=active, turn={ArenaContext.TurnPlayerId}, mine={amSelf}");
-            if (amSelf) Bill.State.GoTo<MyTurnState>();
-            else Bill.State.GoTo<OpponentTurnState>();
+            if (e.newPhase == "active")
+            {
+                var amSelf = !string.IsNullOrEmpty(ArenaContext.TurnPlayerId)
+                             && ArenaContext.TurnPlayerId == ArenaContext.MyDiscordId;
+                Debug.Log($"[Arena.Countdown] phase=active, turn={ArenaContext.TurnPlayerId}, mine={amSelf}");
+                if (amSelf) Bill.State.GoTo<MyTurnState>();
+                else Bill.State.GoTo<OpponentTurnState>();
+            }
+            else if (e.newPhase == "ended")
+            {
+                Debug.Log("[Arena.Countdown] phase=ended → EndState");
+                Bill.State.GoTo<EndState>();
+            }
         }
     }
 }
