@@ -27,6 +27,13 @@ namespace RadiantArena.Bootstrap {
                 juiceGo.AddComponent<RadiantArena.Juice.JuicePresenter>();
             }
 
+            // Spawn ArenaSceneBuilder — configures camera + builds map/players at runtime.
+            if (RadiantArena.Arena.ArenaSceneBuilder.Instance == null)
+            {
+                var sceneGo = new GameObject("[ArenaSceneBuilder]");
+                sceneGo.AddComponent<RadiantArena.Arena.ArenaSceneBuilder>();
+            }
+
             Bill.State.GoTo<RadiantArena.States.BootState>();
         }
 
