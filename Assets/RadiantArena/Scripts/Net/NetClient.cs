@@ -33,6 +33,7 @@ namespace RadiantArena.Net
 
         Client? _client;
         string _lastPhase = "";
+        readonly Dictionary<string, int> _lastHp = new Dictionary<string, int>();
 
         void Awake()
         {
@@ -99,8 +100,7 @@ namespace RadiantArena.Net
                 _ => Debug.Log("[Arena.Net] turn_switched (no handler — D.U4)"));
             Room.OnMessage<SignatureUsedMessage>("signature_used",
                 _ => Debug.Log("[Arena.Net] signature_used (no handler — D.U7)"));
-            Room.OnMessage<MatchEndedMessage>("match_ended",
-                _ => Debug.Log("[Arena.Net] match_ended (no handler — D.U6)"));
+            Room.OnMessage<MatchEndedMessage>("match_ended", OnMatchEnded);
             Room.OnMessage<PongMessage>("pong",
                 _ => { /* silent */ });
             Room.OnMessage<ErrorMessage>("error", m =>
@@ -125,6 +125,27 @@ namespace RadiantArena.Net
                 Bill.Events.Fire(new PhaseChangedEvent { oldPhase = old, newPhase = state.phase });
             }
 
+            // HP diff — fire HpChangedEvent per player whose hp changed since last tick.
+            foreach (var keyObj in state.players.Keys)
+            {
+                if (!(keyObj is string pid)) continue;
+                var p = state.players[pid];
+                if (p == null) continue;
+                int now = p.hp;
+                int max = p.hp_max;
+                if (_lastHp.TryGetValue(pid, out int prev))
+                {
+                    if (prev != now)
+                    {
+                        Bill.Events.Fire(new HpChangedEvent
+                        {
+                            playerId = pid, oldHp = prev, newHp = now, hpMax = max,
+                        });
+                    }
+                }
+                _lastHp[pid] = now;
+            }
+
             if (isFirstState)
             {
                 Bill.Events.Fire(new InitialStateReceivedEvent { sessionId = CurrentInfo.sessionId });
@@ -136,6 +157,7 @@ namespace RadiantArena.Net
             Debug.Log($"[Arena.Net] OnLeave code={code}");
             Room = null;
             _lastPhase = "";
+            _lastHp.Clear();
             ArenaContext.Reset();
             Bill.Events.Fire(new NetDisconnectedEvent { code = code, reason = $"OnLeave code={code}" });
         }
@@ -183,6 +205,30 @@ namespace RadiantArena.Net
             });
         }
 
+        void OnMatchEnded(MatchEndedMessage m)
+        {
+            // Snapshot final_hp into a fresh dict — never hold a reference Colyseus
+            // might mutate (defensive even though match_ended is terminal).
+            var finalHp = new Dictionary<string, int>();
+            if (m.final_hp != null)
+            {
+                foreach (var kv in m.final_hp) finalHp[kv.Key] = kv.Value;
+            }
+
+            ArenaContext.LastMatchWinnerId = m.winner ?? "";
+            ArenaContext.LastMatchOutcome  = m.outcome ?? "";
+            ArenaContext.LastMatchFinalHp  = finalHp;
+
+            Debug.Log($"[Arena.Net] match_ended — winner={m.winner} outcome={m.outcome} hpEntries={finalHp.Count}");
+
+            Bill.Events.Fire(new MatchEndedEvent
+            {
+                winnerId = m.winner ?? "",
+                outcome  = m.outcome ?? "",
+                finalHp  = finalHp,
+            });
+        }
+
         public void Send(string type, object payload)
         {
             if (Room == null)
@@ -203,6 +249,7 @@ namespace RadiantArena.Net
             }
             _client = null;
             _lastPhase = "";
+            _lastHp.Clear();
             ArenaContext.Reset();
             Debug.Log("[Arena.Net] Disconnected");
         }
