@@ -6,9 +6,8 @@
 // "Kéo để nhắm, thả để bắn".
 // Spectator mode: power gauge hidden via USS, hint reads "Đối thủ đang đánh…".
 //
-// Timer always shown — driven by VisualElement scheduler (250ms tick) reading
-// ArenaContext.TurnDeadlineAt (epoch ms). UI displays remaining seconds; server
-// enforces the actual timeout.
+// Turn timer ownership moved to HudPanel in D.U6 — this panel no longer
+// renders the deadline countdown.
 
 using System;
 using BillGameCore;
@@ -25,7 +24,6 @@ namespace RadiantArena.UI
     {
         VisualElement? _root;
         Label? _title;
-        Label? _timer;
         Label? _hint;
         Label? _powerValue;
         VisualElement? _powerFill;
@@ -35,7 +33,6 @@ namespace RadiantArena.UI
 
         Action<AimUpdatedEvent>? _onAimUpdated;
         Action<AimClearedEvent>? _onAimCleared;
-        IVisualElementScheduledItem? _tick;
 
         protected override void Build(VisualElement root)
         {
@@ -53,7 +50,6 @@ namespace RadiantArena.UI
             if (uss != null) root.styleSheets.Add(uss);
 
             _title = root.Q<Label>("title");
-            _timer = root.Q<Label>("timer");
             _hint = root.Q<Label>("hint");
             _powerValue = root.Q<Label>("power-value");
             _powerFill = root.Q<VisualElement>("power-fill");
@@ -81,8 +77,6 @@ namespace RadiantArena.UI
             }
             _currentPower = 0f;
             UpdatePowerVisual();
-            _tick = _root?.schedule.Execute(RefreshTimer).Every(250);
-            RefreshTimer();
         }
 
         public override void OnClosed()
@@ -91,8 +85,6 @@ namespace RadiantArena.UI
             if (_onAimCleared != null) Bill.Events.Unsubscribe(_onAimCleared);
             _onAimUpdated = null;
             _onAimCleared = null;
-            _tick?.Pause();
-            _tick = null;
         }
 
         void OnAimUpdated(AimUpdatedEvent e)
@@ -121,23 +113,6 @@ namespace RadiantArena.UI
                 _powerFill.style.backgroundColor = c;
             }
             if (_powerValue != null) _powerValue.text = $"{(int)(_currentPower * 100f)}%";
-        }
-
-        void RefreshTimer()
-        {
-            if (_timer == null) return;
-            var deadline = ArenaContext.TurnDeadlineAt;
-            if (deadline <= 0)
-            {
-                _timer.text = "—";
-                _timer.EnableInClassList("timer-urgent", false);
-                return;
-            }
-            var nowMs = (long)(System.DateTime.UtcNow - new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc)).TotalMilliseconds;
-            var remainMs = System.Math.Max(0L, deadline - nowMs);
-            var seconds = (int)(remainMs / 1000);
-            _timer.text = $"{seconds}s";
-            _timer.EnableInClassList("timer-urgent", seconds <= 5 && seconds > 0);
         }
     }
 }

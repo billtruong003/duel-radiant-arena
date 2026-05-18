@@ -4,7 +4,6 @@
 
     <ui:VisualElement name="header" class="turn-header">
       <ui:Label name="title" text="LƯỢT CỦA TÔI" class="turn-title" />
-      <ui:Label name="timer" text="—" class="turn-timer" />
     </ui:VisualElement>
 
     <ui:VisualElement name="power-gauge" class="power-gauge">
