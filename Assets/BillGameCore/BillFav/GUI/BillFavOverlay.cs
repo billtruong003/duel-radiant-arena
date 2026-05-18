@@ -103,12 +103,12 @@ namespace BillGameCore.BillFav
             if (!_initOk || BillFavPrefs.PluginDisabled || !BillFavPrefs.OverlayEnabled) return;
 
             _shortcutHeld = IsShortcutHeld();
-            bool mouseOverBrowser = EditorWindow.mouseOverWindow != null &&
-                                    EditorWindow.mouseOverWindow.GetType() == t_ProjectBrowser;
+            var mouseOver = EditorWindow.mouseOverWindow;
+            bool mouseOverBrowser = mouseOver != null && mouseOver.GetType() == t_ProjectBrowser;
 
             if (_shortcutHeld && mouseOverBrowser && _wrappedBrowser == null &&
                 UnityEditorInternal.InternalEditorUtility.isApplicationActive)
-                TryWrap(EditorWindow.mouseOverWindow);
+                TryWrap(mouseOver);
 
             if (!_shortcutHeld && _wrappedBrowser != null && _opacity <= 0.01f)
                 Unwrap();
