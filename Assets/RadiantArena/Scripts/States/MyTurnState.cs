@@ -29,6 +29,7 @@ namespace RadiantArena.States
 
             var go = new GameObject("[ArenaAimController]");
             _aim = go.AddComponent<ArenaAimController>();
+            _aim.SetOrigin(RadiantArena.Arena.ArenaSceneBuilder.Instance?.MyVisual?.transform);
 
             _onPhase = e =>
             {
