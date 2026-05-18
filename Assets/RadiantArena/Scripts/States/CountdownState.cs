@@ -26,6 +26,7 @@ namespace RadiantArena.States
             Debug.Log("[Arena.Countdown] Enter — server lock, awaiting phase=active");
             // D.U7 juice will add a CountdownPanel overlay with 3-2-1 big text.
             if (!Bill.UI.IsOpen<HudPanel>()) Bill.UI.Open<HudPanel>();
+            if (!Bill.UI.IsOpen<DamageNumberLayer>()) Bill.UI.Open<DamageNumberLayer>();
             _onPhase = OnPhaseChanged;
             Bill.Events.Subscribe(_onPhase);
         }

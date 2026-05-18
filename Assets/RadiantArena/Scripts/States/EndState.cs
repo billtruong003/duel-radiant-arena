@@ -25,8 +25,9 @@ namespace RadiantArena.States
             _rendered = false;
 
             // Close all combat UI.
-            if (Bill.UI.IsOpen<HudPanel>())       Bill.UI.Close<HudPanel>();
-            if (Bill.UI.IsOpen<TurnInputPanel>()) Bill.UI.Close<TurnInputPanel>();
+            if (Bill.UI.IsOpen<HudPanel>())          Bill.UI.Close<HudPanel>();
+            if (Bill.UI.IsOpen<DamageNumberLayer>()) Bill.UI.Close<DamageNumberLayer>();
+            if (Bill.UI.IsOpen<TurnInputPanel>())    Bill.UI.Close<TurnInputPanel>();
 
             // Open ResultPanel — may not have payload yet; race-fallback below fills it.
             var panel = Bill.UI.Open<ResultPanel>();

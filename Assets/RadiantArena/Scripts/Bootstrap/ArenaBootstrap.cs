@@ -19,6 +19,14 @@ namespace RadiantArena.Bootstrap {
             ApplyArenaRuntimeTheme();
 
             ArenaStates.Register();
+
+            // Spawn JuicePresenter once — Awake guards duplicates.
+            if (RadiantArena.Juice.JuicePresenter.Instance == null)
+            {
+                var juiceGo = new GameObject("[JuicePresenter]");
+                juiceGo.AddComponent<RadiantArena.Juice.JuicePresenter>();
+            }
+
             Bill.State.GoTo<RadiantArena.States.BootState>();
         }
 

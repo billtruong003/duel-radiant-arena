@@ -22,8 +22,9 @@ namespace RadiantArena.States
         public override void Enter()
         {
             // Defensive — close any leftover combat HUD/result if we re-entered Lobby after a match.
-            if (Bill.UI.IsOpen<HudPanel>())    Bill.UI.Close<HudPanel>();
-            if (Bill.UI.IsOpen<ResultPanel>()) Bill.UI.Close<ResultPanel>();
+            if (Bill.UI.IsOpen<HudPanel>())          Bill.UI.Close<HudPanel>();
+            if (Bill.UI.IsOpen<DamageNumberLayer>()) Bill.UI.Close<DamageNumberLayer>();
+            if (Bill.UI.IsOpen<ResultPanel>())       Bill.UI.Close<ResultPanel>();
 
             var weapons = ArenaContext.MyPlayer != null
                 ? ArenaContext.MyPlayer.AvailableWeapons
