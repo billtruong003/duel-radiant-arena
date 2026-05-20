@@ -72,4 +72,75 @@ namespace RadiantArena.Events
         public float angle;
         public float power;
     }
+
+    /// <summary>
+    /// Fired by NetClient when "shot_resolved" arrives. Plain-C# snapshot of the
+    /// server payload — gameplay never reads the live Colyseus schema.
+    /// </summary>
+    public struct ShotResolvedEvent : IEvent
+    {
+        public RadiantArena.Net.TrajectoryPoint[] points;
+        public string shooterId;
+        public int damage;
+        public bool crit;
+    }
+
+    /// <summary>
+    /// Fired by TrajectoryRenderer when a trajectory point with event="hit:N" or
+    /// event="crit:N" is reached. D.U6 HudPanel subscribes to animate HP; D.U7
+    /// adds camera shake / hit-stop / damage numbers.
+    /// </summary>
+    public struct PlayerHitEvent : IEvent
+    {
+        public int damage;
+        public bool isCrit;
+        public string victimId;
+        public UnityEngine.Vector3 point;
+    }
+
+    /// <summary>
+    /// Fired by TrajectoryRenderer when a trajectory point with event="wall_bounce"
+    /// is reached. D.U7 wires camera shake + wall-dust FX.
+    /// </summary>
+    public struct WallBounceEvent : IEvent
+    {
+        public UnityEngine.Vector3 point;
+    }
+
+    /// <summary>
+    /// Fired by TrajectoryRenderer when playback completes (stop event reached or
+    /// end of points array). AnimatingState subscribes to send animation_complete.
+    /// </summary>
+    public struct TrajectoryFinishedEvent : IEvent
+    {
+        public string shooterId;
+        public int totalDamage;
+    }
+
+    /// <summary>
+    /// Fired by NetClient when a player's hp changes in the state diff. Snapshots
+    /// the (player, old, new, max) into a plain-C# payload so HudPanel never reads
+    /// the live Colyseus schema. D.U6 HudPanel subscribes; D.U7 juice can subscribe
+    /// to drive flash / shake.
+    /// </summary>
+    public struct HpChangedEvent : IEvent
+    {
+        public string playerId;
+        public int oldHp;
+        public int newHp;
+        public int hpMax;
+    }
+
+    /// <summary>
+    /// Fired by NetClient on "match_ended" inbound. Plain-C# snapshot of the
+    /// server payload. EndState opens ResultPanel from this; ArenaContext.LastMatch*
+    /// caches as race-fallback if event arrives before EndState.Enter.
+    /// </summary>
+    public struct MatchEndedEvent : IEvent
+    {
+        public string winnerId;
+        /// <summary>'' | 'win' | 'timeout_join' | 'double_afk' | 'disconnect' | 'concede'</summary>
+        public string outcome;
+        public System.Collections.Generic.Dictionary<string, int> finalHp;
+    }
 }

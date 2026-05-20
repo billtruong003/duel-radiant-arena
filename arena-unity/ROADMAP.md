@@ -19,20 +19,28 @@
 
 ## 2. Priority order (base → polish, execute sequentially)
 
-| # | Lát | Goal (1-line) | Folder |
-|---|---|---|---|
-| 1 | D.U1 | Bootstrap — verify BillGameCore boots, folder layout, ArenaBootstrap skeleton | `tasks/todo/D.U1-bootstrap/` |
-| 2 | D.U2 | NetClient + Colyseus connect | `tasks/todo/D.U2-netclient/` |
-| 3 | D.U3 | LobbyPanel + weapon pick UI | `tasks/todo/D.U3-lobby-panel/` |
-| 4 | D.U4 | TurnInputPanel + drag-aim mechanic | `tasks/todo/D.U4-turn-input/` |
-| 5 | D.U5 | TrajectoryRenderer playback | `tasks/todo/D.U5-trajectory/` |
-| 6 | D.U6 | HudPanel + ResultPanel | `tasks/todo/D.U6-hud-result/` |
-| 7 | D.U7 | Juice pass (camera shake, hit-stop, damage numbers, audio) | `tasks/todo/D.U7-juice/` |
-| 8 | D.U8 | Weapon prefabs (6 catalog + bản mệnh + WeaponHueApplier) | `tasks/todo/D.U8-weapon-prefabs/` |
-| 9 | D.U9 | HLSL shaders (10 shaders, 1/Lát, deferred) | `tasks/todo/D.U9-shaders/` |
-| 10 | D.U10 | WebGL build + Cloudflare Pages deploy | `tasks/todo/D.U10-webgl-deploy/` |
-| 11* | D.U11 | (optional) Replay viewer | tạo khi D.U10 xong |
-| 12* | D.U12 | (optional) PvE mode vs AI | tạo khi D.U10 xong |
+| # | Lát | Goal (1-line) | Folder | Status |
+|---|---|---|---|---|
+| 1 | D.U1 | Bootstrap — verify BillGameCore boots, folder layout, ArenaBootstrap skeleton | `tasks/done/D.U1-bootstrap/` | ✅ |
+| 2 | D.U2 | NetClient + Colyseus connect | `tasks/done/D.U2-netclient/` | ✅ |
+| 3 | D.U3 | LobbyPanel + weapon pick UI | `tasks/done/D.U3-lobby-panel/` | ✅ |
+| 4 | D.U4 | TurnInputPanel + drag-aim mechanic | `tasks/done/D.U4-turn-input/` | ✅ |
+| 5 | D.U5 | TrajectoryRenderer playback | `tasks/done/D.U5-trajectory/` | ✅ |
+| 6 | D.U6 | HudPanel + ResultPanel | `tasks/done/D.U6-hud-result/` | ✅ |
+| 7 | D.U7 | Juice pass (camera shake, hit-stop, damage numbers) — D.U7a closed, D.U7b deferred (audio + color flash + anticipation pulse) | `tasks/done/D.U7-juice/` | ✅ |
+| 8 | **D.U8** | **Arena scene — map + 2 player capsules + top-down orthographic camera + drag-aim origin = my-player** | `tasks/todo/D.U8-arena-scene/` | 🟡 |
+| 9 | **D.U9** | **Weapon prefab catalog (6 weapons + WeaponHueApplier + WeaponPrefabRegistry)** — was D.U8 pre-pivot | `tasks/todo/D.U9-weapon-prefabs/` | ⬜ |
+| 10 | **D.U10** | **UI fantasy polish** — calligraphic font, ink overlay, tier color coding (Phẩm/Địa/Thiên/Tiên/Bản mệnh), dramatic damage numbers | `tasks/todo/D.U10-ui-polish/` | ⬜ |
+| 11 | D.U11 | HLSL shaders (10 shaders, 1/Lát, deferred) — pushed back from D.U9 | `tasks/todo/D.U11-shaders/` | ⬜ |
+| 12 | **D.U12** | **WebGL build + Cloudflare Pages deploy — LAST phase (per Bill)** | `tasks/todo/D.U12-webgl-deploy/` | ⬜ |
+| 13* | D.U13 | (optional) Replay viewer — was D.U11 pre-pivot | tạo khi D.U12 xong | ⬜ |
+| 14* | D.U14 | (optional) PvE mode vs AI — was D.U12 pre-pivot | tạo khi D.U12 xong | ⬜ |
+
+**Scope pivot 2026-05-18 (Bill):**
+- After D.U7a juice, original D.U8 (6-weapon catalog) deferred — pivot to **visible combat first** via **D.U8 arena scene**.
+- Content-first ordering: arena scene → weapon prefabs → UI fantasy polish → deep shader polish → deploy at the very end.
+- WebGL deploy moved from D.U10 to D.U12 (LAST numbered Lát) so client content + polish complete before any public release.
+- Optional Replay viewer + PvE mode renumbered to D.U13 / D.U14.
 
 Scope chi tiết per Lát: xem `TASKS.md`.
 

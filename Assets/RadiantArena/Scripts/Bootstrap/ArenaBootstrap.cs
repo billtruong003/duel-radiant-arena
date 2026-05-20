@@ -19,6 +19,21 @@ namespace RadiantArena.Bootstrap {
             ApplyArenaRuntimeTheme();
 
             ArenaStates.Register();
+
+            // Spawn JuicePresenter once — Awake guards duplicates.
+            if (RadiantArena.Juice.JuicePresenter.Instance == null)
+            {
+                var juiceGo = new GameObject("[JuicePresenter]");
+                juiceGo.AddComponent<RadiantArena.Juice.JuicePresenter>();
+            }
+
+            // Spawn ArenaSceneBuilder — configures camera + builds map/players at runtime.
+            if (RadiantArena.Arena.ArenaSceneBuilder.Instance == null)
+            {
+                var sceneGo = new GameObject("[ArenaSceneBuilder]");
+                sceneGo.AddComponent<RadiantArena.Arena.ArenaSceneBuilder>();
+            }
+
             Bill.State.GoTo<RadiantArena.States.BootState>();
         }
 

@@ -151,7 +151,33 @@
 
 ---
 
-## 🗡️ Lát D.U8 — Weapon prefabs (6 catalog + bản mệnh)
+## 🌅 Lát D.U8 — Arena scene (map + players + camera)
+
+> **Pivot 2026-05-18:** original D.U8 scope (6-weapon catalog) deferred to D.U9. New scope below — **visible combat first** so playtest feels concrete. Deploy moved to D.U12 (LAST).
+
+**Goal:** Open Play, focus Game View, immediately see top-down orthographic arena with 2 player capsules + ground + walls + drag-aim line originating from my-player.
+
+**Scope:**
+- `ArenaSceneBuilder.cs` (singleton MonoBehaviour, spawned by `ArenaBootstrap.InitArena`) — configure Main Camera (ortho top-down `(0, 10, 0)` Euler `(90, 0, 0)` size 6) + runtime-spawn ground Plane (10×10 world units = sim 1000×1000 via `TrajectoryConstants.WorldFromSim`) + 4 wall Cubes at borders + 2 player Capsules at slot anchors (me=`(-3, 0.5, 0)` green, opp=`(3, 0.5, 0)` orange).
+- `PlayerVisual.cs` — attached to each capsule; polls `ArenaContext.MyPlayer/OpponentPlayer.X/Y` every 100ms; `transform.position = WorldFromSim(x, y)` (Y kept at capsule center 0.5); fallback to SlotAnchor when server uninitialized (x=y=0).
+- `ArenaAimController.SetOrigin` wired from `MyTurnState.Enter` passing `ArenaSceneBuilder.Instance.MyVisual.transform` — drag-aim line now origins at my-player capsule (not `Vector3.zero` as today).
+- `ArenaBuildSettingsFixer.cs` (Editor menu `Tools > RadiantArena > Set Bootstrap as Scene 0`) — one-shot Bill runs once to prevent SampleScene-loaded-by-default sessions.
+- All runtime-spawn — no scene-file diff to Bootstrap.unity (precedent: JuicePresenter D.U7).
+- Materials inline via URP/Unlit shader, no `.mat` assets.
+
+**Out of scope:**
+- Weapon prefabs / hue tint — D.U9.
+- UI fantasy polish — D.U10.
+- HLSL toon/outline shaders — D.U11.
+- WebGL deploy — D.U12 (LAST phase).
+- Animations / IK / player rigs — future.
+- Audio (footstep / ambient) — D.U7b or beyond.
+
+**DoD:** Bill enters Play (after fixer applied), sees arena top-down + 2 capsules + drag-aim from green capsule + D.U7 juice effects firing on synthetic events. Mock smoke probes Camera ortho config + scene GO presence + aim controller origin = MyVisual.transform. Bill subjective visual sign-off.
+
+---
+
+## 🗡️ Lát D.U9 — Weapon prefab catalog (was D.U8 pre-pivot)
 
 **Goal:** Each weapon visually distinct via prefab + hue applied at runtime from `weapon.visual.hue`.
 
@@ -161,13 +187,35 @@
 - `_placeholder` fallback prefab (grey sphere) for unknown slugs.
 - `WeaponPrefabRegistry.cs` lookup.
 - `WeaponHueApplier.cs` — accept hex color string, MaterialPropertyBlock tint base color.
-- `PlayerVisual.cs` — spawn correct weapon prefab on player slot during onJoin hydration.
+- Extend D.U8's `PlayerVisual.cs` — spawn correct weapon prefab parented to player capsule transform during onJoin hydration.
+- Hook anticipation pulse (D.U7b deferred) — scale weapon prefab 1.0→1.15 over 80ms before release.
 
-**DoD:** Both players see distinct weapon models per slug. Bản mệnh weapons show generic prefab but with unique hue per Discord ID.
+**DoD:** Both players see distinct weapon models per slug. Bản mệnh weapons show generic prefab but with unique hue per Discord ID. Anticipation pulse visible.
 
 ---
 
-## 🎨 Lát D.U9 — HLSL shaders (10 listed)
+## 🎨 Lát D.U10 — UI fantasy polish
+
+**Goal:** Lift placeholder dark-glass UI (lobby.uss / hud.uss / etc.) into a tu-tiên/cultivation-themed feel that matches the bot's narrative voice.
+
+**Scope:**
+- Vietnamese-friendly serif/calligraphic font (Google Fonts: e.g., `Cinzel`, `Cormorant`, or Vietnamese-compatible alternative). Import as `.ttf` → TextMeshPro-style asset for UI Toolkit.
+- Tier color coding per weapon: Phẩm (slate), Địa (bronze), Thiên (gold), Tiên (cyan), Bản mệnh (rainbow gradient).
+- Ink-wash texture overlay on panel backgrounds (single shared PNG, ~256×256 tileable).
+- Replace numeric damage labels (D.U7a `damage_number.uss`) with dramatic outline + drop-shadow + larger crit pulse.
+- ResultPanel banner: brush-stroke underline + ink-wash card background.
+- HUD weapon name with tier color accent.
+
+**Out of scope:**
+- Full localization (Vietnamese static strings throughout — already mostly there from D.U3+).
+- Audio fonts/SFX cues (D.U7b).
+- HLSL shader effects (D.U11 — `DamageNumberShader.shader` etc.).
+
+**DoD:** Bill subjective "feels like a martial-arts cultivation game" sign-off. Specific A/B checks: lobby weapon list shows tier colors, HUD shows tier accent under weapon name, ResultPanel banner reads dramatic, damage numbers feel "weighty" not generic.
+
+---
+
+## ✨ Lát D.U11 — HLSL shaders (10 listed)
 
 **Goal:** Stylize cartoon visual direction locked in. See `Docs/RADIANT_ARENA_UNITY.md` §11 for full list.
 
@@ -189,7 +237,9 @@
 
 ---
 
-## 🚀 Lát D.U10 — WebGL build + Cloudflare Pages deploy
+## 🚀 Lát D.U12 — WebGL build + Cloudflare Pages deploy · LAST phase
+
+> **Order rule (Bill 2026-05-18):** deploy is the **final** numbered Lát. All client content + polish + shaders ship before any public URL goes live.
 
 **Goal:** `arena.billthedev.com/?room=X&t=Y` loads + plays.
 
@@ -205,7 +255,7 @@
 
 ---
 
-## 🧪 Optional Lát D.U11 — Replay viewer
+## 🧪 Optional Lát D.U13 — Replay viewer
 
 **Goal:** Standalone page (or same Unity build with replay mode) plays back trajectory blob from server's replay endpoint.
 
@@ -218,7 +268,7 @@
 
 ---
 
-## 🎯 Optional Lát D.U12 — PvE mode
+## 🎯 Optional Lát D.U14 — PvE mode
 
 **Goal:** Solo player vs AI opponent using same DuelRoom infrastructure but with bot-controlled second player.
 
